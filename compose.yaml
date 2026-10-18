@@ -1,0 +1,28 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-treasure}
+      POSTGRES_USER: ${POSTGRES_USER:-treasure}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/00-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-treasure} -d ${POSTGRES_DB:-treasure}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  api:
+    build: ./api
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-treasure}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-treasure}
+      APP_SECRET: ${APP_SECRET:?Set APP_SECRET in .env}
+      TOKEN_TTL_SECONDS: ${TOKEN_TTL_SECONDS:-3600}
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  pgdata:

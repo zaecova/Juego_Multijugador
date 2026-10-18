@@ -1,0 +1,8 @@
+config_version=5
+
+[application]
+config/name="En busca del tesoro - servidor"
+run/main_scene="res://server.tscn"
+
+[network]
+limits/debugger/max_chars_per_second=100000

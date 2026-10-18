@@ -1,0 +1,43 @@
+# En busca del tesoro
+
+Juego de carreras bíblico con una arquitectura online en desarrollo. El cliente y el servidor de partidas usan Godot 4 y ENet; una API HTTPS gestiona cuentas y progreso, y PostgreSQL conserva los datos.
+
+## Componentes
+
+- `api/`: API JSON para registro, inicio de sesión y progreso. Las contraseñas se almacenan con Argon2id; los tokens de sesión son firmados y expiran.
+- `database/`: esquema inicial de PostgreSQL.
+- `game_server/`: proyecto Godot headless con autoridad de partida en el servidor.
+- `compose.yaml`: API y base de datos para desarrollo local.
+
+## Vista previa jugable
+
+Para ver una demo local sin instalar dependencias, en PowerShell ejecuta `$env:PORT=8001; python preview/server.py` y abre `http://localhost:8001`. Puedes probarla como invitado o crear una cuenta local con correo, contraseña (mínimo 8 caracteres) y género; el avatar de perfil cambia según la opción elegida. Las pestañas abiertas en esta misma instancia comparten una sala de prueba: los jugadores se ven y sus cambios de carril se sincronizan. La carrera, los obstáculos y el progreso todavía se simulan localmente en cada navegador; falta conectarlos al servidor autoritativo Godot. Esta demo no envía correo de verificación y guarda las cuentas en `preview/preview.sqlite3`; es independiente de la API y del servidor Godot descritos arriba, y no debe publicarse como servicio de producción. El botón de Google queda pendiente de configurar OAuth Client ID.
+
+Si olvidaste la contraseña de una cuenta local, ejecuta `python preview/reset_password.py` desde la carpeta del proyecto y sigue las indicaciones en la terminal. La contraseña nueva se escribe de forma oculta y no se envía por chat. La demo todavía no tiene recuperación por correo.
+
+Para borrar todas las cuentas locales de la demo, ejecuta `python preview/clear_accounts.py`.
+
+## Requisitos
+
+- Docker Desktop con Docker Compose.
+- Godot 4.2 o posterior para abrir/ejecutar el servidor y, cuando se añada, el cliente.
+
+## Ejecutar API y base de datos
+
+1. Copia `.env.example` a `.env` y cambia `APP_SECRET` por un valor aleatorio largo.
+2. Ejecuta `docker compose up --build`.
+3. La API de desarrollo queda en `http://localhost:8000`; documentación interactiva: `/docs`.
+
+Endpoints iniciales: `POST /v1/auth/register`, `POST /v1/auth/login`, `GET /v1/me` y `GET /health`.
+
+Para producción, publica la API detrás de un proxy con TLS, define secretos seguros y limita solicitudes en el proxy. El servicio de partidas debe exponerse solo en el puerto UDP configurado. No se deben aceptar puntuaciones ni progreso calculados por el cliente.
+
+## Servidor de partidas
+
+Abre `game_server/project.godot` con Godot 4 y ejecuta `server.gd` en modo headless. El puerto ENet predeterminado es UDP 2456. El servidor mantiene la posición, carril, salto, colisiones y puntuación; el cliente solo envía acciones. Esta primera base todavía no incluye el cliente jugable ni una integración de identidad entre API y ENet.
+
+## Estado y siguientes pasos
+
+La base online cubre cuentas, tokens, persistencia de perfiles y una sala ENet autoritativa mínima. A continuación se debe conectar el cliente Godot, validar el token de API al entrar a la sala, añadir progreso de partidas y configurar HTTPS/limitación de solicitudes para despliegue.
+
+Las citas bíblicas deben revisarse junto con la licencia de la traducción elegida antes de publicar.
