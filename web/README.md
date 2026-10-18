@@ -34,3 +34,29 @@ Los textos bíblicos son fragmentos abreviados de la maqueta; falta seleccionar 
 
 ## Corrección de creación de sala
 Los registros de producción mostraban autenticación correcta seguida de respuestas 401 al crear salas. El cliente ahora conserva y envía explícitamente la sesión y la credencial de sala, sin depender de que el alojamiento reenvíe cookies o el encabezado Authorization. La prueba de regresión registra una cuenta, crea e inicia una sala y comprueba la revocación sin enviar cookies. Si la sesión venció, la interfaz vuelve al inicio de sesión.
+
+## Jungla fotográfica y alias
+La vegetación usa las fotografías proporcionadas de palmeras, cacao y atardecer. Se alternan a lo largo de la carrera y forman capas con movimiento alrededor del camino. Los archivos se conservan como fotografías originales en `public/jungle/`; no se usa la fotografía que contiene una persona. El campo «Tu nombre o alias en la partida» se muestra al crear o unirse a la sala; el servidor limita su longitud y lo muestra sobre el corredor y en la lista de jugadores. El alias no cambia el usuario de acceso.
+
+## Sendero de rocas
+El camino usa piedras irregulares con perspectiva. Los obstáculos son escalones naturales de roca que atraviesan los tres carriles. El servidor exige estar en el aire al llegar al escalón; cambiar de carril no evita el desnivel. Los carriles se usan para recoger las pistas.
+
+## Libro de recompensa
+Cuando el servidor confirma que se ha recogido una nueva pista, aparece un libro abierto con resplandor dorado, referencia y texto bíblico. Permanece 3 segundos; el texto también queda en el panel de recorrido. El aviso permite seguir jugando y no pausa la carrera multijugador. Reiniciar la ronda o salir limpia el libro y su temporizador.
+
+## Sonidos de naturaleza
+`public/nature-audio.js` sintetiza un arroyo suave y cantos de pájaros mediante Web Audio. Al aparecer el libro se escucha un acorde suave y relajante de tres segundos. Se inicia tras la primera interacción del usuario, suena durante la carrera y se silencia al terminar, salir o pasar la pestaña a segundo plano. Incluye interruptor y volumen. Son sonidos sintetizados, no grabaciones de aves ni agua. No solicita acceso al micrófono ni descarga audio externo.
+
+Los mensajes de recompensa se encolan para que cada texto permanezca tres segundos completos, incluso si se recoge otra pista antes de terminar de leer. Al salir o reiniciar se vacía la cola. El sonido de recompensa respeta el volumen, el silencio y la visibilidad de la pestaña.
+
+## Tiempo de reacción ampliado
+La velocidad de avance es de 4,5 unidades por segundo para mantener un ritmo tranquilo y tiempo para preparar los saltos. El recorrido actual es de 810 unidades y dura tres minutos, más la cuenta atrás. El servidor envía la velocidad en el estado para que el movimiento del navegador coincida con las colisiones. Se conserva la duración del salto y de los mensajes.
+
+## Audio audible y prueba manual
+Se aumenta el volumen inicial al 65 % y se reajusta la mezcla del arroyo y los sonidos de recompensa. «Probar sonido» activa el contexto de audio tras el gesto del usuario y reproduce tres segundos de arroyo, canto y tono relajante, incluso fuera de la carrera. El botón desactiva el silencio y restaura el volumen al 65 % si estaba a cero. La vista del juego declara permiso de reproducción de audio. Las pruebas automáticas comprueban también la prueba de audio fuera de carrera; no sustituyen la comprobación auditiva en los altavoces del usuario.
+
+## Carrera de tres minutos
+El recorrido se amplía a 810 unidades manteniendo la velocidad de 4,5 unidades por segundo: llegar a la meta toma 180 segundos de carrera, además de tres segundos de cuenta atrás. Las doce pistas y los desniveles se distribuyen por el nuevo recorrido. El estado incluye velocidad, meta y posiciones de las pistas para sincronizar navegador y servidor. El HUD muestra el tiempo restante. Agotar las vidas puede terminar la partida antes de llegar a la meta.
+
+## Acceso y contraste
+El inicio de sesión vuelve a mostrarse sobre el escenario dentro del panel original de bordes redondeados. Los botones principales tienen fondo verde oscuro y texto blanco explícitos, incluidos los estados normal, hover y deshabilitado. Los enlaces y botones secundarios usan texto oscuro sobre fondos claros. El botón principal permanece debajo de la contraseña y no se desplaza al pasar el cursor. El panel de alias y creación de sala mantiene su apariencia original.

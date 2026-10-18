@@ -24,7 +24,7 @@ test('accounts, password recovery, authenticated room, two players and shared ra
  const b=await request(auth,{op:'register',username:'ana',email:'ana@example.test',password:'Test-password-567'});assert.equal(b.status,200);
  r=await request(auth,{op:'login',identifier:'zara@example.test',password:'incorrect-password'});assert.equal(r.status,401);
  r=await request(auth,{op:'login',identifier:'zara',password:'Test-password-137'});assert.equal(r.status,200);
- const created=await request(room,{op:'create',name:'ignored'},a.cookie);assert.equal(created.status,200);assert.equal(created.data.players[0].name,'zara');assert.equal(created.data.players[0].accountId,undefined);
+ const created=await request(room,{op:'create',name:'Zara Aventurera'},a.cookie);assert.equal(created.status,200);assert.equal(created.data.players[0].name,'Zara Aventurera');assert.equal(created.data.players[0].accountId,undefined);
  const code=created.data.code,ta=created.data.token;
  const joined=await request(room,{op:'join',code},b.cookie);assert.equal(joined.status,200);assert.equal(joined.data.players.length,2);const tb=joined.data.token;
  const forbidden=await request(room,{op:'start',code},b.cookie,tb);assert.equal(forbidden.status,403);

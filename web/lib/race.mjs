@@ -1,5 +1,5 @@
-export const TRACK = Array.from({length:12},(_,i)=>({index:i,d:18+i*21,lane:i%3,points:100+i*50}));
-export const SPEED=9, FINISH=278;
+export const TRACK = Array.from({length:12},(_,i)=>({index:i,d:45+i*63,lane:i%3,points:100+i*50}));
+export const SPEED=4.5, FINISH=810;
 export function runner(id,name,token,now,avatar='exploradora') {
  return {id,name,token,avatar,lane:1,fromX:0,movedAt:0,jumpedAt:-99,points:0,lives:3,attempts:3,clues:[],passed:[],hits:[],done:false,won:false,seen:now,lastAction:0,message:'¡Sigue las luces doradas!'};
 }
@@ -12,17 +12,17 @@ export function advance(room,now){
  const t=Math.max(0,(now-room.startAt)/1000);
  for(const p of room.players){
   if(p.done)continue;
-  const events=TRACK.flatMap(c=>[{kind:'clue',...c},{kind:'hit',index:c.index,d:c.d+8,lane:(c.index+1)%3}]).sort((a,b)=>a.d-b.d);
+  const events=TRACK.flatMap(c=>[{kind:'clue',...c},{kind:'hit',index:c.index,d:c.d+24,lane:(c.index+1)%3}]).sort((a,b)=>a.d-b.d);
   for(const e of events){
    if(p.done||e.d/SPEED>t)break;
    const passed=e.kind==='clue'?p.passed:p.hits;
    if(passed.includes(e.index))continue;
    passed.push(e.index);
-   if(Math.abs(xAt(p,e.d/SPEED)-(e.lane-1))>.36)continue;
+   if(e.kind==='clue'&&Math.abs(xAt(p,e.d/SPEED)-(e.lane-1))>.36)continue;
    if(e.kind==='clue'){
     p.clues.push(e.index);p.points+=e.points;p.message='Pista encontrada';
    }else if(heightAt(p,e.d/SPEED)<1.25){
-    p.attempts--;p.message='¡Tronco! Pierdes una oportunidad.';
+    p.attempts--;p.message='¡Desnivel! Salta el escalón del camino.';
     if(p.attempts===0){p.lives--;p.attempts=3;}
     if(p.lives===0){p.done=true;p.finishAt=e.d/SPEED;p.message='Te quedaste sin vidas.';}
    }
@@ -45,5 +45,5 @@ export function reset(room,now){
 }
 export function publicRoom(room,now,myId){
  const t=room.status==='waiting'?0:Math.max(0,(now-room.startAt)/1000);
- return {code:room.code,status:room.status,host:room.host,round:room.round,serverNow:now,startAt:room.startAt,myId,players:room.players.map(({token,accountId,...p})=>({...p,x:xAt(p,t),height:heightAt(p,t),distance:Math.min(FINISH,(p.done?p.finishAt||0:t)*SPEED)}))};
+ return {code:room.code,status:room.status,host:room.host,round:room.round,serverNow:now,speed:SPEED,finish:FINISH,track:TRACK,startAt:room.startAt,myId,players:room.players.map(({token,accountId,...p})=>({...p,x:xAt(p,t),height:heightAt(p,t),distance:Math.min(FINISH,(p.done?p.finishAt||0:t)*SPEED)}))};
 }
