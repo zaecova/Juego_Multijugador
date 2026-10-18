@@ -37,3 +37,6 @@ Los registros de producción mostraban autenticación correcta seguida de respue
 
 ## Jungla fotográfica y alias
 La vegetación usa las fotografías proporcionadas de palmeras, cacao y atardecer. Se alternan a lo largo de la carrera y forman capas con movimiento alrededor del camino. Los archivos se conservan como fotografías originales en `public/jungle/`; no se usa la fotografía que contiene una persona. El campo «Tu nombre o alias en la partida» se muestra al crear o unirse a la sala; el servidor limita su longitud y lo muestra sobre el corredor y en la lista de jugadores. El alias no cambia el usuario de acceso.
+
+## Sendero de rocas
+El camino usa piedras irregulares con perspectiva. Los obstáculos son escalones naturales de roca que atraviesan los tres carriles. El servidor exige estar en el aire al llegar al escalón; cambiar de carril no evita el desnivel. Los carriles se usan para recoger las pistas.

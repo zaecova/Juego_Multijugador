@@ -18,11 +18,11 @@ export function advance(room,now){
    const passed=e.kind==='clue'?p.passed:p.hits;
    if(passed.includes(e.index))continue;
    passed.push(e.index);
-   if(Math.abs(xAt(p,e.d/SPEED)-(e.lane-1))>.36)continue;
+   if(e.kind==='clue'&&Math.abs(xAt(p,e.d/SPEED)-(e.lane-1))>.36)continue;
    if(e.kind==='clue'){
     p.clues.push(e.index);p.points+=e.points;p.message='Pista encontrada';
    }else if(heightAt(p,e.d/SPEED)<1.25){
-    p.attempts--;p.message='¡Tronco! Pierdes una oportunidad.';
+    p.attempts--;p.message='¡Desnivel! Salta el escalón del camino.';
     if(p.attempts===0){p.lives--;p.attempts=3;}
     if(p.lives===0){p.done=true;p.finishAt=e.d/SPEED;p.message='Te quedaste sin vidas.';}
    }
