@@ -17,7 +17,7 @@ export async function POST(request:Request){
   if(!body||typeof body!=='object')return json({error:'Solicitud inválida'},400);
   const op=body.op,now=Date.now();
   if(!['create','join','state','action','start','leave'].includes(op))return json({error:'Acción desconocida'},400);
-  const user=await currentUser(request);
+  const user=await currentUser(request,body.sessionToken);
   if(!user)return json({error:'Inicia sesión para entrar al juego.'},401);
   const db=env.DB;
   if(!db)return json({error:'La sala todavía se está preparando. Vuelve a intentar.'},503);
@@ -39,7 +39,7 @@ export async function POST(request:Request){
    const row=await db.prepare('SELECT state,revision,expires_at FROM rooms WHERE code=?').bind(code).first<{state:string,revision:number,expires_at:number}>();
    if(!row||row.expires_at<now)return json({error:'La sala no existe o ha caducado.'},404);
    const room=JSON.parse(row.state);
-   const token=request.headers.get('authorization')?.replace(/^Bearer /,'')||'';
+   const token=typeof body.roomToken==='string'?body.roomToken:request.headers.get('authorization')?.replace(/^Bearer /,'')||'';
    let p=room.players.find((p:any)=>p.token===token&&p.accountId===user.id);
    if(p)p.seen=now;
    advance(room,now);

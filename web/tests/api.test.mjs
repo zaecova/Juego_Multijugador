@@ -43,3 +43,18 @@ test('accounts, password recovery, authenticated room, two players and shared ra
  const out=await request(auth,{op:'logout'},r.cookie);assert.equal(out.status,200);
  const me=await auth.GET(new Request('https://game.test/api/auth',{headers:{Cookie:r.cookie}}));assert.equal((await me.json()).user,null);
 });
+
+test('session and room work when hosting or the browser does not forward the session cookie',async()=>{
+ const signed=await request(auth,{op:'register',username:'cookie_free',email:'cookie-free@example.test',password:'A-strong-test-password-847'});
+ assert.equal(signed.status,200);
+ const sessionToken=signed.data.sessionToken;
+ assert.match(sessionToken,/^[a-f0-9]{64}$/);
+ const me=await request(auth,{op:'me',sessionToken});assert.equal(me.data.user.username,'cookie_free');
+ const created=await request(room,{op:'create',sessionToken});assert.equal(created.status,200);
+ const code=created.data.code,roomToken=created.data.token;
+ const start=await request(room,{op:'start',code,sessionToken,roomToken});assert.equal(start.status,200);assert.equal(start.data.status,'racing');
+ const state=await request(room,{op:'state',code,sessionToken,roomToken});assert.equal(state.status,200);
+ const rejected=await request(room,{op:'create',sessionToken:'f'.repeat(64)});assert.equal(rejected.status,401);
+ const logout=await request(auth,{op:'logout',sessionToken});assert.equal(logout.status,200);
+ const stale=await request(room,{op:'state',code,sessionToken,roomToken});assert.equal(stale.status,401);
+});

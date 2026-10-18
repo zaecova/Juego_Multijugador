@@ -29,13 +29,15 @@ body{font-family:Arial,sans-serif}.nav{margin-bottom:28px}.modal{max-width:420px
 const c=document.getElementById('game'),ctx=c.getContext('2d'),W=c.width,H=c.height,$=id=>document.getElementById(id);
 const VERSES=[["Salmos 119:105", "Lámpara es a mis pies tu palabra."], ["Josué 1:9", "Esfuérzate y sé valiente."], ["Salmos 23:1", "Jehová es mi pastor."], ["Filipenses 4:13", "Todo lo puedo en Cristo."], ["Proverbios 3:5", "Confía en Jehová."], ["Salmos 46:1", "Dios es nuestro amparo."], ["Mateo 5:14", "Sois la luz del mundo."], ["Juan 14:6", "Yo soy el camino."], ["Salmos 37:5", "Encomienda tu camino."], ["1 Juan 4:8", "Dios es amor."], ["Romanos 8:39", "Nada nos separará del amor de Dios."], ["Jeremías 31:3", "Con amor eterno te he amado."]];
 const playerY=470;let world=0;const trailCenterAt=y=>480+Math.sin(y*.012+world*.005)*44*(y/H)+Math.sin(y*.005+world*.003)*22*(y/H),trailHalfWidthAt=y=>35+205*(y/H),lanePosition=(n,y)=>trailCenterAt(y)+(n-1)*trailHalfWidthAt(y)*.62;
-let authUser=null,accountMode='login',recoveryCode='';
+let authUser=null,accountMode='login',recoveryCode='',accountToken='';
+try{accountToken=sessionStorage.getItem('treasureAccountSession')||'';}catch{}
+function storeSession(key,value){try{if(value===null)sessionStorage.removeItem(key);else sessionStorage.setItem(key,value);}catch{}}
 let lane=1,targetX=lanePosition(1,playerY),playerX=targetX,jump=0,score=0,lives=3,collected=0,obstacles=[],pickups=[],playing=false,playerId='',roomPlayers=[],snapshot=null,offset=0,lastNow=0,session=null,polling=false,lastClues=0,endedRound=-1,busy=false,actionQueue=Promise.resolve();
 try{session=JSON.parse(sessionStorage.getItem('treasureRoom')||'null');}catch{}
 const invited=new URLSearchParams(location.search).get('room');if(invited)$('code').value=invited.toUpperCase().slice(0,6);
 function message(text){$('authMessage').textContent=text;$('roomStatus').textContent=text;}
 async function api(op,extra={}){
- const response=await fetch('/api/room',{method:'POST',headers:{'Content-Type':'application/json',...(session?.token?{Authorization:'Bearer '+session.token}:{})},body:JSON.stringify({op,code:session?.code,...extra}),signal:AbortSignal.timeout(10000)});
+ const response=await fetch('/api/room',{method:'POST',headers:{'Content-Type':'application/json',...(session?.token?{Authorization:'Bearer '+session.token}:{})},body:JSON.stringify({op,code:session?.code,roomToken:session?.token,sessionToken:accountToken,...extra}),signal:AbortSignal.timeout(10000)});
  const data=await response.json();if(!response.ok){const e=new Error(data.error||'No pudimos conectar.');e.status=response.status;throw e;}return data;
 }
 function accept(data){
@@ -64,11 +66,11 @@ function accept(data){
  }
 }
 async function enter(op){if(busy)return;busy=true;message('Conectando con la selva…');$('create').disabled=$('join').disabled=true;
- try{const name=$('name').value.trim()||'Explorador',avatar=$('avatar').value,code=$('code').value.trim().toUpperCase();session=null;lastNow=0;const data=await api(op,{name,avatar,code});session={code:data.code,token:data.token};sessionStorage.setItem('treasureRoom',JSON.stringify(session));accept(data);message('');}
- catch(e){message(e.message);}finally{busy=false;$('create').disabled=$('join').disabled=false;}
+ try{const name=$('name').value.trim()||'Explorador',avatar=$('avatar').value,code=$('code').value.trim().toUpperCase();session=null;lastNow=0;const data=await api(op,{name,avatar,code});session={code:data.code,token:data.token};storeSession('treasureRoom',JSON.stringify(session));accept(data);message('');}
+ catch(e){if(e.status===401){await loadAccount();if(!authUser){$('authOverlay').hidden=true;$('accountOverlay').hidden=false;$('accountMessage').textContent='Tu sesión terminó. Inicia sesión para crear una sala.';}}message(e.message);}finally{busy=false;$('create').disabled=$('join').disabled=false;}
 }
 async function poll(){if(!session||polling)return;polling=true;try{accept(await api('state'));}catch(e){if(e.status===401||e.status===404){clearSession();message(e.message);await loadAccount();}else message('Reconectando… '+e.message);}finally{polling=false;}}
-function clearSession(){session=null;snapshot=null;roomPlayers=[];playing=false;lastNow=0;sessionStorage.removeItem('treasureRoom');$('roomPanel').hidden=true;$('authOverlay').hidden=!authUser;$('accountOverlay').hidden=!!authUser;$('endOverlay').hidden=true;}
+function clearSession(){session=null;snapshot=null;roomPlayers=[];playing=false;lastNow=0;storeSession('treasureRoom',null);$('roomPanel').hidden=true;$('authOverlay').hidden=!authUser;$('accountOverlay').hidden=!!authUser;$('endOverlay').hidden=true;}
 async function start(){try{accept(await api('start'));}catch(e){message(e.message);}}
 function action(a){if(!playing||!snapshot||Date.now()+offset<snapshot.startAt)return;const round=snapshot.round;actionQueue=actionQueue.then(async()=>{if(!session||snapshot.round!==round)return;try{accept(await api('action',{action:a,round}));}catch(e){message(e.message);}});}
 function renderState(){if(!snapshot)return;const me=snapshot.players.find(p=>p.id===playerId);if(!me)return;
@@ -128,18 +130,18 @@ function accountScreen(mode){
  $('accountSwitch').textContent=reg||rec?'Volver a iniciar sesión':'Crear una cuenta';$('forgot').hidden=rec;$('accountMessage').textContent='';
 }
 function showUser(user){authUser=user;$('accountBar').hidden=!user;$('accountUsername').textContent=user?.username||'';$('signedInName').textContent=user?'Explorando como '+user.username:'';$('name').value=user?.username||'';$('accountOverlay').hidden=!!user;$('authOverlay').hidden=!user||!!snapshot;}
-async function loadAccount(){try{const r=await fetch('/api/auth',{cache:'no-store'});if(!r.ok)throw Error();const d=await r.json();showUser(d.user);if(!d.user){session=null;sessionStorage.removeItem('treasureRoom');}}catch{$('accountMessage').textContent='No pudimos comprobar tu sesión. Vuelve a intentar.';}}
+async function loadAccount(){try{const r=await fetch('/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({op:'me',sessionToken:accountToken}),cache:'no-store'});if(!r.ok)throw Error();const d=await r.json();showUser(d.user);if(!d.user){accountToken='';storeSession('treasureAccountSession',null);session=null;storeSession('treasureRoom',null);}}catch{$('accountMessage').textContent='No pudimos comprobar tu sesión. Vuelve a intentar.';}}
 $('accountSwitch').onclick=()=>accountScreen(accountMode==='login'?'register':'login');$('forgot').onclick=()=>accountScreen('recover');
 $('accountForm').onsubmit=async e=>{
  e.preventDefault();$('accountSubmit').disabled=true;$('accountMessage').textContent='Conectando…';
  try{const r=await fetch('/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({op:accountMode,identifier:$('identifier').value,username:$('username').value,email:$('email').value,password:$('password').value,recovery:$('recoveryInput').value})});const data=await r.json();if(!r.ok)throw Error(data.error||'No pudimos iniciar sesión.');
- clearSession();showUser(data.user);$('password').value='';$('recoveryInput').value='';$('accountMessage').textContent='';
+ accountToken=data.sessionToken||'';storeSession('treasureAccountSession',accountToken);clearSession();showUser(data.user);$('password').value='';$('recoveryInput').value='';$('accountMessage').textContent='';
  if(data.recovery){recoveryCode=data.recovery;$('recoveryCode').textContent=recoveryCode;$('recoveryOverlay').hidden=false;$('authOverlay').hidden=true;$('savedRecovery').checked=false;$('recoveryContinue').disabled=true;}
  }catch(err){$('accountMessage').textContent=err.message;}finally{$('accountSubmit').disabled=false;}
 };
 $('savedRecovery').onchange=()=>{$('recoveryContinue').disabled=!$('savedRecovery').checked;};
 $('downloadRecovery').onclick=()=>{const blob=new Blob(['En busca del tesoro — código personal de recuperación\nUsuario: '+authUser.username+'\nCódigo: '+recoveryCode+'\nGuárdalo de forma privada. El código se reemplaza al restablecer la contraseña.\n'],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='mi-codigo-del-tesoro.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 $('recoveryContinue').onclick=()=>{if(!$('savedRecovery').checked)return;$('recoveryOverlay').hidden=true;recoveryCode='';$('recoveryCode').textContent='';$('authOverlay').hidden=false;};
-$('signout').onclick=async()=>{if(session){try{await api('leave');}catch{}}try{await fetch('/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({op:'logout'})});}catch{}authUser=null;clearSession();showUser(null);accountScreen('login');};
+$('signout').onclick=async()=>{if(session){try{await api('leave');}catch{}}try{await fetch('/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({op:'logout',sessionToken:accountToken})});}catch{}accountToken='';storeSession('treasureAccountSession',null);authUser=null;clearSession();showUser(null);accountScreen('login');};
 setInterval(poll,200);loadAccount().then(()=>{if(authUser&&session)poll();});requestAnimationFrame(frame);
 })();</script></body></html>
