@@ -60,3 +60,8 @@ El recorrido se amplía a 810 unidades manteniendo la velocidad de 4,5 unidades 
 
 ## Acceso y contraste
 El inicio de sesión vuelve a mostrarse sobre el escenario dentro del panel original de bordes redondeados. Los botones principales tienen fondo verde oscuro y texto blanco explícitos, incluidos los estados normal, hover y deshabilitado. Los enlaces y botones secundarios usan texto oscuro sobre fondos claros. El botón principal permanece debajo de la contraseña y no se desplaza al pasar el cursor. El panel de alias y creación de sala mantiene su apariencia original.
+
+## Clasificación y coronas por tiempo
+El objetivo es reunir los doce pergaminos en el menor tiempo posible dentro de la ronda de 180 segundos. El servidor registra el instante exacto del último pergamino, independiente de cuándo se consulta el estado. Cada tropiezo cuesta una oportunidad y añade 1,5 segundos de detención al progreso; no mueve al corredor hacia atrás.
+
+Los participantes que completan reciben puesto por tiempo ascendente: oro para el primero, plata para el segundo y bronce para el tercero. El cuarto y quienes no completan no reciben corona. Los empates exactos en milisegundos comparten puesto (1, 1, 3). Las coronas se ven sobre el personaje, en la sala y en los resultados. La clasificación no depende de puntos ni de orden de conexión. Se reinicia al comenzar otra ronda; no es una recompensa permanente de perfil. Los que completan esperan hasta el final de los tres minutos a los demás.
