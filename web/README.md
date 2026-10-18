@@ -51,3 +51,6 @@ Los mensajes de recompensa se encolan para que cada texto permanezca tres segund
 
 ## Tiempo de reacción ampliado
 La velocidad de avance baja de 9 a 4,5 unidades por segundo: cada desnivel tarda el doble en llegar y la carrera dura unos 62 segundos, más la cuenta atrás. El servidor envía la velocidad en el estado para que el movimiento del navegador coincida con las colisiones. Se conserva la duración del salto y de los mensajes.
+
+## Audio audible y prueba manual
+Se aumenta el volumen inicial al 65 % y se reajusta la mezcla del arroyo y los sonidos de recompensa. «Probar sonido» activa el contexto de audio tras el gesto del usuario y reproduce tres segundos de arroyo, canto y tono relajante, incluso fuera de la carrera. El botón desactiva el silencio y restaura el volumen al 65 % si estaba a cero. La vista del juego declara permiso de reproducción de audio. Las pruebas automáticas comprueban también la prueba de audio fuera de carrera; no sustituyen la comprobación auditiva en los altavoces del usuario.
