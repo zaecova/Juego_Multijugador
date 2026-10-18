@@ -40,3 +40,6 @@ La vegetación usa las fotografías proporcionadas de palmeras, cacao y atardece
 
 ## Sendero de rocas
 El camino usa piedras irregulares con perspectiva. Los obstáculos son escalones naturales de roca que atraviesan los tres carriles. El servidor exige estar en el aire al llegar al escalón; cambiar de carril no evita el desnivel. Los carriles se usan para recoger las pistas.
+
+## Libro de recompensa
+Cuando el servidor confirma que se ha recogido una nueva pista, aparece un libro abierto con resplandor dorado, referencia y texto bíblico. Permanece 2,2 segundos; el texto también queda en el panel de recorrido. El aviso permite seguir jugando y no pausa la carrera multijugador. Reiniciar la ronda o salir limpia el libro y su temporizador.
