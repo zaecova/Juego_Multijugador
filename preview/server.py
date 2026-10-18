@@ -15,7 +15,7 @@ import uuid
 from urllib.parse import parse_qs
 
 ROOT = Path(__file__).parent
-DB_PATH = ROOT / "preview.sqlite3"
+DB_PATH = Path(os.environ.get("PREVIEW_DB_PATH", str(ROOT / "preview.sqlite3")))
 SECRET = os.environ.get("PREVIEW_SECRET", "local-preview-only-change-me").encode()
 ROOM_LOCK = threading.Lock()
 ROOM_PLAYERS = {}
@@ -177,6 +177,6 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    server = ThreadingHTTPServer(("127.0.0.1", int(os.environ.get("PORT", "8000"))), Handler)
+    server = ThreadingHTTPServer(("0.0.0.0", int(os.environ.get("PORT", "8000"))), Handler)
     print(f"Demo lista: http://localhost:{server.server_port}", flush=True)
     server.serve_forever()

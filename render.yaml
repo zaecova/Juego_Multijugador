@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: en-busca-del-tesoro
+    runtime: python
+    plan: free
+    buildCommand: "echo 'No hay dependencias externas'"
+    startCommand: python preview/server.py
+    healthCheckPath: /api/health
+    envVars:
+      - key: PREVIEW_DB_PATH
+        value: /tmp/preview.sqlite3
+      - key: PREVIEW_SECRET
+        generateValue: true

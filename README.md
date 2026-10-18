@@ -17,6 +17,12 @@ Si olvidaste la contraseña de una cuenta local, ejecuta `python preview/reset_p
 
 Para borrar todas las cuentas locales de la demo, ejecuta `python preview/clear_accounts.py`.
 
+## Publicar una demo online
+
+El archivo `render.yaml` permite crear una demo web en Render desde este repositorio: en Render elige **New > Blueprint**, conecta `zaecova/Juego_Multijugador` y confirma la creación del servicio `en-busca-del-tesoro`. Render asignará una URL HTTPS al terminar. El servicio acepta conexiones externas y la sala de prueba sincroniza jugadores mientras la instancia está activa.
+
+Esta configuración usa el plan gratuito y almacenamiento temporal. Render puede apagar la instancia y borrar las cuentas SQLite; úsala solo para probar, nunca para guardar contraseñas importantes. Además, las partidas siguen siendo una sala de demostración: posiciones y obstáculos no se comparten con autoridad del servidor Godot. Para un lanzamiento estable hacen falta almacenamiento persistente y conectar el cliente al servidor de partidas.
+
 ## Requisitos
 
 - Docker Desktop con Docker Compose.
