@@ -10,6 +10,9 @@ test('client initialization and first frame have no missing elements or variable
  const element=id=>{if(!ids.has(id))throw Error('Missing DOM element: '+id);if(!elements.has(id))elements.set(id,{value:'',hidden:false,style:{},classList:{add:noop,remove:noop},append:noop,replaceChildren:noop,addEventListener:noop,setAttribute:noop,getContext:()=>ctx,width:960,height:570});return elements.get(id);};
  const doc={getElementById:element,querySelectorAll:()=>[],createElement:()=>({append:noop}),activeElement:{tagName:'BODY'}};
  const window={addEventListener:noop};const sandbox={document:doc,window,URL,URLSearchParams,location:{href:'https://game.test/game.html',search:''},sessionStorage:{getItem:()=>null,removeItem:noop,setItem:noop},navigator:{},requestAnimationFrame:fn=>render=fn,setInterval:noop,setTimeout:noop,fetch:async()=>({ok:true,json:async()=>({user:null})}),Image:class {complete=true;naturalWidth=900;naturalHeight=1600;},console,Blob,AbortSignal};
+ assert.match(html,/<script src="\/nature-audio\.js\?v=3"><\/script>/);
+ vm.runInNewContext(await readFile('public/nature-audio.js','utf8'),sandbox);
+ assert.equal(typeof window.TreasureNature,'function');
  vm.runInNewContext(html.split('<script>')[1].split('</script>')[0],sandbox);
  assert.equal(typeof render,'function');render();await new Promise(resolve=>setImmediate(resolve));assert.equal(element('accountOverlay').hidden,false);
 });
