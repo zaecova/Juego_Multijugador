@@ -58,7 +58,5 @@ Se aumenta el volumen inicial al 65 % y se reajusta la mezcla del arroyo y los s
 ## Carrera de tres minutos
 El recorrido se amplía a 810 unidades manteniendo la velocidad de 4,5 unidades por segundo: llegar a la meta toma 180 segundos de carrera, además de tres segundos de cuenta atrás. Las doce pistas y los desniveles se distribuyen por el nuevo recorrido. El estado incluye velocidad, meta y posiciones de las pistas para sincronizar navegador y servidor. El HUD muestra el tiempo restante. Agotar las vidas puede terminar la partida antes de llegar a la meta.
 
-## Acceso integrado en la página
-El formulario de acceso se muestra en una sección normal antes del tablero, con el botón principal verde debajo de la contraseña y el enlace de registro debajo del formulario. No usa una ventana flotante ni desplazamiento interno. Se conserva la recuperación de contraseña y, al acceder, la sección se oculta para mostrar la sala. Se declara explícitamente la carga del módulo de sonido antes del script del juego.
-
-El botón principal de acceso es un elemento estático de ancho completo, sin desplazamiento al pasar el puntero ni contenedor con desplazamiento interno. No se añaden pestañas de acceso duplicadas.
+## Acceso y contraste
+El inicio de sesión vuelve a mostrarse sobre el escenario dentro del panel original de bordes redondeados. Los botones principales tienen fondo verde oscuro y texto blanco explícitos, incluidos los estados normal, hover y deshabilitado. Los enlaces y botones secundarios usan texto oscuro sobre fondos claros. El botón principal permanece debajo de la contraseña y no se desplaza al pasar el cursor. El panel de alias y creación de sala mantiene su apariencia original.
