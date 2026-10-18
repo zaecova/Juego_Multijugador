@@ -34,3 +34,6 @@ Los textos bíblicos son fragmentos abreviados de la maqueta; falta seleccionar 
 
 ## Corrección de creación de sala
 Los registros de producción mostraban autenticación correcta seguida de respuestas 401 al crear salas. El cliente ahora conserva y envía explícitamente la sesión y la credencial de sala, sin depender de que el alojamiento reenvíe cookies o el encabezado Authorization. La prueba de regresión registra una cuenta, crea e inicia una sala y comprueba la revocación sin enviar cookies. Si la sesión venció, la interfaz vuelve al inicio de sesión.
+
+## Jungla fotográfica y alias
+La vegetación usa las fotografías proporcionadas de palmeras, cacao y atardecer. Se alternan a lo largo de la carrera y forman capas con movimiento alrededor del camino. Los archivos se conservan como fotografías originales en `public/jungle/`; no se usa la fotografía que contiene una persona. El campo «Tu nombre o alias en la partida» se muestra al crear o unirse a la sala; el servidor limita su longitud y lo muestra sobre el corredor y en la lista de jugadores. El alias no cambia el usuario de acceso.

@@ -26,7 +26,7 @@ export async function POST(request:Request){
    await db.prepare('DELETE FROM rooms WHERE code IN (SELECT code FROM rooms WHERE expires_at < ? LIMIT 20)').bind(now).run();
    for(let attempt=0;attempt<4;attempt++){
     const code=makeCode();
-    const first=runner(newId,user.username,newToken,now,body.avatar==='explorador'?'explorador':'exploradora');first.accountId=user.id;
+    const first=runner(newId,clean(body.name||user.username),newToken,now,body.avatar==='explorador'?'explorador':'exploradora');first.accountId=user.id;
     const room={code,host:newId,round:0,status:'waiting',startAt:0,players:[first]};
     const result=await db.prepare('INSERT OR IGNORE INTO rooms(code,state,revision,expires_at) VALUES(?,?,0,?)').bind(code,JSON.stringify(room),now+3600000).run();
     if(result.meta.changes)return json({...publicRoom(room,now,newId),token:newToken});
@@ -46,7 +46,7 @@ export async function POST(request:Request){
    if(op==='join'&&!p){
     if(room.status==='racing')return json({error:'La carrera ya comenzó. Espera a la siguiente ronda.'},409);
     if(room.players.length>=4)return json({error:'La sala ya tiene cuatro jugadores.'},409);
-    p=runner(newId,user.username,newToken,now,body.avatar==='explorador'?'explorador':'exploradora');
+    p=runner(newId,clean(body.name||user.username),newToken,now,body.avatar==='explorador'?'explorador':'exploradora');
     p.accountId=user.id;
     const existing=room.players.find((q:any)=>q.accountId===user.id);
     if(existing)return json({error:'Ya estás en esta sala. Usa la pestaña original o espera 25 segundos para volver a entrar.'},409);
