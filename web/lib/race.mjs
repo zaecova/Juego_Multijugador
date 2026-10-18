@@ -1,5 +1,5 @@
 export const TRACK = Array.from({length:12},(_,i)=>({index:i,d:18+i*21,lane:i%3,points:100+i*50}));
-export const SPEED=9, FINISH=278;
+export const SPEED=4.5, FINISH=278;
 export function runner(id,name,token,now,avatar='exploradora') {
  return {id,name,token,avatar,lane:1,fromX:0,movedAt:0,jumpedAt:-99,points:0,lives:3,attempts:3,clues:[],passed:[],hits:[],done:false,won:false,seen:now,lastAction:0,message:'¡Sigue las luces doradas!'};
 }
@@ -45,5 +45,5 @@ export function reset(room,now){
 }
 export function publicRoom(room,now,myId){
  const t=room.status==='waiting'?0:Math.max(0,(now-room.startAt)/1000);
- return {code:room.code,status:room.status,host:room.host,round:room.round,serverNow:now,startAt:room.startAt,myId,players:room.players.map(({token,accountId,...p})=>({...p,x:xAt(p,t),height:heightAt(p,t),distance:Math.min(FINISH,(p.done?p.finishAt||0:t)*SPEED)}))};
+ return {code:room.code,status:room.status,host:room.host,round:room.round,serverNow:now,speed:SPEED,startAt:room.startAt,myId,players:room.players.map(({token,accountId,...p})=>({...p,x:xAt(p,t),height:heightAt(p,t),distance:Math.min(FINISH,(p.done?p.finishAt||0:t)*SPEED)}))};
 }

@@ -48,3 +48,6 @@ Cuando el servidor confirma que se ha recogido una nueva pista, aparece un libro
 `public/nature-audio.js` sintetiza un arroyo suave y cantos de pájaros mediante Web Audio. Al aparecer el libro se escucha un acorde suave y relajante de tres segundos. Se inicia tras la primera interacción del usuario, suena durante la carrera y se silencia al terminar, salir o pasar la pestaña a segundo plano. Incluye interruptor y volumen. Son sonidos sintetizados, no grabaciones de aves ni agua. No solicita acceso al micrófono ni descarga audio externo.
 
 Los mensajes de recompensa se encolan para que cada texto permanezca tres segundos completos, incluso si se recoge otra pista antes de terminar de leer. Al salir o reiniciar se vacía la cola. El sonido de recompensa respeta el volumen, el silencio y la visibilidad de la pestaña.
+
+## Tiempo de reacción ampliado
+La velocidad de avance baja de 9 a 4,5 unidades por segundo: cada desnivel tarda el doble en llegar y la carrera dura unos 62 segundos, más la cuenta atrás. El servidor envía la velocidad en el estado para que el movimiento del navegador coincida con las colisiones. Se conserva la duración del salto y de los mensajes.
