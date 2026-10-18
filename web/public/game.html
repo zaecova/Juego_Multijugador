@@ -33,12 +33,14 @@ const junglePhotos=['/jungle/palmeras.jpeg','/jungle/cacao.jpeg','/jungle/atarde
 const natureSound=window.TreasureNature?new window.TreasureNature():null;
 const VERSES=[["Salmos 119:105", "Lámpara es a mis pies tu palabra."], ["Josué 1:9", "Esfuérzate y sé valiente."], ["Salmos 23:1", "Jehová es mi pastor."], ["Filipenses 4:13", "Todo lo puedo en Cristo."], ["Proverbios 3:5", "Confía en Jehová."], ["Salmos 46:1", "Dios es nuestro amparo."], ["Mateo 5:14", "Sois la luz del mundo."], ["Juan 14:6", "Yo soy el camino."], ["Salmos 37:5", "Encomienda tu camino."], ["1 Juan 4:8", "Dios es amor."], ["Romanos 8:39", "Nada nos separará del amor de Dios."], ["Jeremías 31:3", "Con amor eterno te he amado."]];
 const playerY=470;let world=0;const trailCenterAt=y=>480+Math.sin(y*.012+world*.005)*44*(y/H)+Math.sin(y*.005+world*.003)*22*(y/H),trailHalfWidthAt=y=>35+205*(y/H),lanePosition=(n,y)=>trailCenterAt(y)+(n-1)*trailHalfWidthAt(y)*.62;
-let rewardTimer=0;
-function showRewardBook(verse){
- natureSound?.chirp(true);clearTimeout(rewardTimer);$('bookReference').textContent=verse[0];$('bookVerse').textContent='“'+verse[1]+'”';$('rewardBook').hidden=false;
- rewardTimer=setTimeout(()=>{$('rewardBook').hidden=true;},2200);
+let rewardTimer=0,rewardQueue=[];
+function showRewardBook(verse){rewardQueue.push(verse);if(!rewardTimer)nextRewardBook();}
+function nextRewardBook(){
+ const verse=rewardQueue.shift();if(!verse){rewardTimer=0;$('rewardBook').hidden=true;return;}
+ natureSound?.relax();$('bookReference').textContent=verse[0];$('bookVerse').textContent='“'+verse[1]+'”';$('rewardBook').hidden=false;
+ rewardTimer=setTimeout(()=>{rewardTimer=0;nextRewardBook();},3000);
 }
-function hideRewardBook(){clearTimeout(rewardTimer);$('rewardBook').hidden=true;}
+function hideRewardBook(){clearTimeout(rewardTimer);rewardTimer=0;rewardQueue=[];$('rewardBook').hidden=true;}
 let authUser=null,accountMode='login',recoveryCode='',accountToken='';
 try{accountToken=sessionStorage.getItem('treasureAccountSession')||'';}catch{}
 function storeSession(key,value){try{if(value===null)sessionStorage.removeItem(key);else sessionStorage.setItem(key,value);}catch{}}

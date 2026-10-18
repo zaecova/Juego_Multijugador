@@ -24,3 +24,5 @@ test('the reward adds a short birdsong and cannot sound while muted',()=>{
  const {audio,contexts}=setup();audio.unlock();audio.setActive(true);const before=contexts[0].oscillators.length;
  audio.chirp(true);assert.equal(contexts[0].oscillators.length,before+4);audio.setMuted(true);audio.chirp(true);assert.equal(contexts[0].oscillators.length,before+4);
 });
+
+test('the relaxing message sound also works after the race and respects mute',()=>{const {audio,contexts}=setup();audio.unlock();const before=contexts[0].oscillators.length;audio.relax();assert.equal(contexts[0].oscillators.length,before+3);audio.setMuted(true);audio.relax();assert.equal(contexts[0].oscillators.length,before+3);assert.equal(audio.rewardBus.gain.last,0);});

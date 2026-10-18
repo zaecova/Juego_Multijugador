@@ -42,7 +42,9 @@ La vegetación usa las fotografías proporcionadas de palmeras, cacao y atardece
 El camino usa piedras irregulares con perspectiva. Los obstáculos son escalones naturales de roca que atraviesan los tres carriles. El servidor exige estar en el aire al llegar al escalón; cambiar de carril no evita el desnivel. Los carriles se usan para recoger las pistas.
 
 ## Libro de recompensa
-Cuando el servidor confirma que se ha recogido una nueva pista, aparece un libro abierto con resplandor dorado, referencia y texto bíblico. Permanece 2,2 segundos; el texto también queda en el panel de recorrido. El aviso permite seguir jugando y no pausa la carrera multijugador. Reiniciar la ronda o salir limpia el libro y su temporizador.
+Cuando el servidor confirma que se ha recogido una nueva pista, aparece un libro abierto con resplandor dorado, referencia y texto bíblico. Permanece 3 segundos; el texto también queda en el panel de recorrido. El aviso permite seguir jugando y no pausa la carrera multijugador. Reiniciar la ronda o salir limpia el libro y su temporizador.
 
 ## Sonidos de naturaleza
-`public/nature-audio.js` sintetiza un arroyo suave y cantos de pájaros mediante Web Audio. Al aparecer el libro se escucha un breve canto adicional. Se inicia tras la primera interacción del usuario, suena durante la carrera y se silencia al terminar, salir o pasar la pestaña a segundo plano. Incluye interruptor y volumen. Son sonidos sintetizados, no grabaciones de aves ni agua. No solicita acceso al micrófono ni descarga audio externo.
+`public/nature-audio.js` sintetiza un arroyo suave y cantos de pájaros mediante Web Audio. Al aparecer el libro se escucha un acorde suave y relajante de tres segundos. Se inicia tras la primera interacción del usuario, suena durante la carrera y se silencia al terminar, salir o pasar la pestaña a segundo plano. Incluye interruptor y volumen. Son sonidos sintetizados, no grabaciones de aves ni agua. No solicita acceso al micrófono ni descarga audio externo.
+
+Los mensajes de recompensa se encolan para que cada texto permanezca tres segundos completos, incluso si se recoge otra pista antes de terminar de leer. Al salir o reiniciar se vacía la cola. El sonido de recompensa respeta el volumen, el silencio y la visibilidad de la pestaña.

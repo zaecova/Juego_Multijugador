@@ -1,7 +1,7 @@
 /* Nature ambience synthesized locally: no microphone, downloads or external audio. */
 (()=>{
  class NatureAudio {
-  constructor(){this.context=null;this.master=null;this.ambient=null;this.active=false;this.muted=false;this.volume=.35;this.visible=true;this.birdTimer=0;this.unavailable=false;}
+  constructor(){this.context=null;this.master=null;this.ambient=null;this.rewardBus=null;this.active=false;this.muted=false;this.volume=.35;this.visible=true;this.birdTimer=0;this.unavailable=false;}
   unlock(){
    if(this.muted||this.unavailable)return;
    try{
@@ -9,7 +9,7 @@
      const Audio=window.AudioContext||window.webkitAudioContext;
      if(!Audio){this.unavailable=true;return;}
      const c=this.context=new Audio();
-     this.master=c.createGain();this.master.gain.value=0;this.master.connect(c.destination);
+     this.master=c.createGain();this.master.gain.value=0;this.master.connect(c.destination);this.rewardBus=c.createGain();this.rewardBus.connect(c.destination);
      this.ambient=c.createGain();this.ambient.gain.value=.55;this.ambient.connect(this.master);
      // Filtered brown noise forms a quiet, continuously flowing stream.
      const buffer=c.createBuffer(1,Math.floor(c.sampleRate*3),c.sampleRate),samples=buffer.getChannelData(0);
@@ -31,12 +31,24 @@
   shouldPlay(){return this.active&&!this.muted&&this.visible&&this.volume>0;}
   sync(){
    if(!this.context)return;
+   this.rewardBus.gain.setTargetAtTime(!this.muted&&this.visible?this.volume*.45:0,this.context.currentTime,.08);
    this.master.gain.setTargetAtTime(this.shouldPlay()?this.volume*.45:0,this.context.currentTime,.12);
    if(this.shouldPlay()){if(!this.birdTimer)this.scheduleBird();}
    else{clearTimeout(this.birdTimer);this.birdTimer=0;}
   }
   scheduleBird(){
    this.birdTimer=setTimeout(()=>{this.birdTimer=0;if(!this.shouldPlay())return;this.chirp(false);this.scheduleBird();},2500+Math.random()*3500);
+  }
+  relax(){
+   if(!this.context||this.muted||!this.visible||this.volume<=0||this.context.state==='suspended')return;
+   const c=this.context,start=c.currentTime+.01;
+   // Gentle consonant tones rise slowly and fade across the full reading interval.
+   for(const frequency of [523.25,659.25,783.99]){
+    const tone=c.createOscillator(),gain=c.createGain();tone.type='sine';tone.frequency.value=frequency;
+    gain.gain.setValueAtTime(.0001,start);gain.gain.exponentialRampToValueAtTime(.045,start+.4);gain.gain.setTargetAtTime(.014,start+1,.6);gain.gain.exponentialRampToValueAtTime(.0001,start+2.97);
+    tone.connect(gain);gain.connect(this.rewardBus);tone.start(start);tone.stop(start+3);
+    tone.onended=()=>{tone.disconnect();gain.disconnect();};
+   }
   }
   chirp(reward=false){
    if(!this.context||!this.shouldPlay()||this.context.state==='suspended')return;
