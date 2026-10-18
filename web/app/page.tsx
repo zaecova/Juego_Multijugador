@@ -1,1 +1,1 @@
-export default function Home(){return <iframe src="/game.html?v=libro-resplandeciente-5" title="En busca del tesoro: juego multijugador" style={{position:'fixed',inset:0,width:'100%',height:'100%',border:0}} allow="fullscreen"/>;}
+export default function Home(){return <iframe src="/game.html?v=naturaleza-sonido-6" title="En busca del tesoro: juego multijugador" style={{position:'fixed',inset:0,width:'100%',height:'100%',border:0}} allow="fullscreen"/>;}

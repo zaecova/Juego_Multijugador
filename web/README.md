@@ -43,3 +43,6 @@ El camino usa piedras irregulares con perspectiva. Los obstáculos son escalones
 
 ## Libro de recompensa
 Cuando el servidor confirma que se ha recogido una nueva pista, aparece un libro abierto con resplandor dorado, referencia y texto bíblico. Permanece 2,2 segundos; el texto también queda en el panel de recorrido. El aviso permite seguir jugando y no pausa la carrera multijugador. Reiniciar la ronda o salir limpia el libro y su temporizador.
+
+## Sonidos de naturaleza
+`public/nature-audio.js` sintetiza un arroyo suave y cantos de pájaros mediante Web Audio. Al aparecer el libro se escucha un breve canto adicional. Se inicia tras la primera interacción del usuario, suena durante la carrera y se silencia al terminar, salir o pasar la pestaña a segundo plano. Incluye interruptor y volumen. Son sonidos sintetizados, no grabaciones de aves ni agua. No solicita acceso al micrófono ni descarga audio externo.
