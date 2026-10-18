@@ -9,6 +9,14 @@ Juego de carreras bíblico con una arquitectura online en desarrollo. El cliente
 - `game_server/`: proyecto Godot headless con autoridad de partida en el servidor.
 - `compose.yaml`: API y base de datos para desarrollo local.
 
+## Versión web publicada
+
+Juega en: **https://en-busca-del-tesoro-online.snugmule3.chatgpt.site**
+
+La carpeta `web/` contiene la versión de navegador publicada con Sites: cuentas con correo o usuario, contraseña, recuperación con código personal y salas multijugador de hasta cuatro participantes. El servidor valida la carrera y sincroniza el estado mediante HTTPS. No se envían correos de recuperación; cada usuario debe guardar el código que recibe al crear su cuenta.
+
+Esta adaptación usa Canvas con perspectiva. Es independiente del cliente Godot y de la demo Python anterior. La compilación y siete pruebas automatizadas pasaron; la revisión visual en navegador y la prueba con dispositivos físicos siguen pendientes. Consulta [`web/README.md`](web/README.md).
+
 ## Cliente Godot jugable: multijugador LAN
 
 El proyecto `godot_client/project.godot` incorpora el corredor 3D de selva con pistas bíblicas, obstáculos, vidas y puntuación. Ábrelo en Godot **4.3 o posterior** y ejecútalo con F5.
