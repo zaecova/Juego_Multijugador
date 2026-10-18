@@ -9,6 +9,18 @@ Juego de carreras bíblico con una arquitectura online en desarrollo. El cliente
 - `game_server/`: proyecto Godot headless con autoridad de partida en el servidor.
 - `compose.yaml`: API y base de datos para desarrollo local.
 
+## Cliente Godot jugable: multijugador LAN
+
+El proyecto `godot_client/project.godot` incorpora el corredor 3D de selva con pistas bíblicas, obstáculos, vidas y puntuación. Ábrelo en Godot **4.3 o posterior** y ejecútalo con F5.
+
+- Hasta cuatro jugadores: uno crea la partida y los demás se unen por su IP local.
+- El anfitrión inicia la carrera y calcula movimiento, colisiones y puntos.
+- Usa **UDP 24560**, distinto del servidor independiente de `game_server/`.
+- Para una prueba en el mismo equipo, abre dos instancias y usa `127.0.0.1`.
+- Instrucciones y pruebas reproducibles: [`godot_client/README.md`](godot_client/README.md).
+
+Este cliente es un prototipo LAN autónomo: todavía no se conecta con `api/`, `database/`, `game_server/` ni la demo web. No incluye cuentas ni partidas por Internet. La conexión se comprobó con dos procesos locales en Godot 4.3; queda pendiente probar la interfaz visual y equipos físicos.
+
 ## Vista previa jugable
 
 Para ver una demo local sin instalar dependencias, en PowerShell ejecuta `$env:PORT=8001; python preview/server.py` y abre `http://localhost:8001`. Puedes probarla como invitado o crear una cuenta local con correo, contraseña (mínimo 8 caracteres) y género; el avatar de perfil cambia según la opción elegida. Las pestañas abiertas en esta misma instancia comparten una sala de prueba: los jugadores se ven y sus cambios de carril se sincronizan. La carrera, los obstáculos y el progreso todavía se simulan localmente en cada navegador; falta conectarlos al servidor autoritativo Godot. Esta demo no envía correo de verificación y guarda las cuentas en `preview/preview.sqlite3`; es independiente de la API y del servidor Godot descritos arriba, y no debe publicarse como servicio de producción. El botón de Google queda pendiente de configurar OAuth Client ID.
@@ -26,7 +38,7 @@ Esta configuración usa el plan gratuito y almacenamiento temporal. Render puede
 ## Requisitos
 
 - Docker Desktop con Docker Compose.
-- Godot 4.2 o posterior para abrir/ejecutar el servidor y, cuando se añada, el cliente.
+- Godot 4.2 o posterior para abrir/ejecutar el servidor; Godot 4.3 o posterior para el cliente LAN.
 
 ## Ejecutar API y base de datos
 
@@ -40,10 +52,10 @@ Para producción, publica la API detrás de un proxy con TLS, define secretos se
 
 ## Servidor de partidas
 
-Abre `game_server/project.godot` con Godot 4 y ejecuta `server.gd` en modo headless. El puerto ENet predeterminado es UDP 2456. El servidor mantiene la posición, carril, salto, colisiones y puntuación; el cliente solo envía acciones. Esta primera base todavía no incluye el cliente jugable ni una integración de identidad entre API y ENet.
+Abre `game_server/project.godot` con Godot 4 y ejecuta `server.gd` en modo headless. El puerto ENet predeterminado es UDP 2456. El servidor mantiene la posición, carril, salto, colisiones y puntuación; el cliente solo envía acciones. Este servidor todavía no está integrado con el cliente LAN de `godot_client/` ni con la identidad de la API.
 
 ## Estado y siguientes pasos
 
-La base online cubre cuentas, tokens, persistencia de perfiles y una sala ENet autoritativa mínima. A continuación se debe conectar el cliente Godot, validar el token de API al entrar a la sala, añadir progreso de partidas y configurar HTTPS/limitación de solicitudes para despliegue.
+La base online cubre cuentas, tokens, persistencia de perfiles y una sala ENet autoritativa mínima. A continuación se debe integrar el cliente Godot LAN con este servidor, validar el token de API al entrar a la sala, añadir progreso de partidas y configurar HTTPS/limitación de solicitudes para despliegue.
 
 Las citas bíblicas deben revisarse junto con la licencia de la traducción elegida antes de publicar.
