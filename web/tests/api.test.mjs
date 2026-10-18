@@ -58,3 +58,19 @@ test('session and room work when hosting or the browser does not forward the ses
  const logout=await request(auth,{op:'logout',sessionToken});assert.equal(logout.status,200);
  const stale=await request(room,{op:'state',code,sessionToken,roomToken});assert.equal(stale.status,401);
 });
+
+test('room API accepts lane change and immediate jump without dropping either input',async()=>{
+ const signed=await request(auth,{op:'register',username:'control_test',email:'controls@example.test',password:'Controls-test-password-258'});
+ assert.equal(signed.status,200);
+ const sessionToken=signed.data.sessionToken;
+ const created=await request(room,{op:'create',sessionToken});assert.equal(created.status,200);
+ const credentials={sessionToken,code:created.data.code,roomToken:created.data.token};
+ const started=await request(room,{op:'start',...credentials});clock=started.data.startAt+100;
+ const round=started.data.round;
+ let r=await request(room,{op:'action',...credentials,round,action:'left'});assert.equal(r.status,200);assert.equal(r.data.players[0].lane,0);
+ r=await request(room,{op:'action',...credentials,round,action:'jump'});assert.equal(r.status,200);
+ clock+=200;r=await request(room,{op:'state',...credentials});assert.equal(r.data.players[0].lane,0);assert.ok(r.data.players[0].height>0);
+ r=await request(room,{op:'action',...credentials,round,action:'right'});assert.equal(r.data.players[0].lane,1);
+ clock+=100;r=await request(room,{op:'action',...credentials,round,action:'right'});assert.equal(r.data.players[0].lane,2);
+ clock+=100;r=await request(room,{op:'action',...credentials,round,action:'right'});assert.equal(r.data.players[0].lane,2);
+});

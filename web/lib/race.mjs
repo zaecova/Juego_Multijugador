@@ -48,9 +48,11 @@ export function advance(room,now){
  if(t>=deadline)room.status='finished';
 }
 export function input(room,p,action,now){
- if(room.status!=='racing'||now<room.startAt||p.done||now-p.lastAction<70)return;
+ if(room.status!=='racing'||now<room.startAt||p.done)return;
  const t=(now-room.startAt)/1000;
  if(action==='left'||action==='right'){
+  if(now-(p.lastLaneAction||0)<70)return;
+  p.lastLaneAction=now;
   p.fromX=xAt(p,t);p.movedAt=t;p.lane=Math.max(0,Math.min(2,p.lane+(action==='left'?-1:1)));
  }else if(action==='jump'&&heightAt(p,t)===0)p.jumpedAt=t;
  p.lastAction=now;
