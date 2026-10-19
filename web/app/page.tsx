@@ -1,1 +1,1 @@
-export default function Home(){return <iframe src="/game.html?v=distribucion-escritorio-16" title="En busca del tesoro: juego multijugador" style={{position:'fixed',inset:0,width:'100%',height:'100%',border:0}} allow="autoplay; fullscreen"/>;}
+export default function Home(){return <iframe src="/game.html?v=copiar-solo-codigo-17" title="En busca del tesoro: juego multijugador" style={{position:'fixed',inset:0,width:'100%',height:'100%',border:0}} allow="autoplay; fullscreen; clipboard-write"/>;}
