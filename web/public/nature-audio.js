@@ -21,7 +21,10 @@
      source.connect(high);high.connect(low);low.connect(stream);stream.connect(this.ambient);source.start();
      const ripple=c.createOscillator(),depth=c.createGain();ripple.frequency.value=.19;depth.gain.value=.06;ripple.connect(depth);depth.connect(stream.gain);ripple.start();
     }
-    this.sync();return Promise.resolve(this.context.resume()).then(()=>{this.sync();return this.context.state==='running';}).catch(()=>false);
+    // Resume synchronously within the touch/click gesture, including after phone interruptions.
+    const c=this.context,resuming=c.state==='running'?Promise.resolve():c.resume();
+    const pulse=c.createBufferSource();pulse.buffer=c.createBuffer(1,1,c.sampleRate);pulse.connect(c.destination);pulse.onended=()=>pulse.disconnect();pulse.start(0);
+    this.sync();return Promise.resolve(resuming).then(()=>{this.sync();return this.context.state==='running';}).catch(()=>false);
    }catch{this.unavailable=true;return Promise.resolve(false);}
   }
   setActive(value){if(this.active===!!value)return;this.active=!!value;this.sync();}
@@ -46,7 +49,7 @@
    this.testTimer=setTimeout(()=>{this.testing=false;this.testTimer=0;this.sync();},3000);return true;
   }
   relax(){
-   if(!this.context||this.muted||!this.visible||this.volume<=0||this.context.state==='suspended')return;
+   if(!this.context||this.muted||!this.visible||this.volume<=0||this.context.state!=='running')return;
    const c=this.context,start=c.currentTime+.01;
    // Gentle consonant tones rise slowly and fade across the full reading interval.
    for(const frequency of [523.25,659.25,783.99]){
@@ -57,7 +60,7 @@
    }
   }
   chirp(reward=false){
-   if(!this.context||!this.shouldPlay()||this.context.state==='suspended')return;
+   if(!this.context||!this.shouldPlay()||this.context.state!=='running')return;
    const c=this.context,start=c.currentTime+.015,count=reward?4:2;
    for(let i=0;i<count;i++){
     const at=start+i*.14,frequency=(reward?2100:1750)+i*230+Math.random()*300;
