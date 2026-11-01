@@ -74,3 +74,31 @@ test('room API accepts lane change and immediate jump without dropping either in
  clock+=100;r=await request(room,{op:'action',...credentials,round,action:'right'});assert.equal(r.data.players[0].lane,2);
  clock+=100;r=await request(room,{op:'action',...credentials,round,action:'right'});assert.equal(r.data.players[0].lane,2);
 });
+
+test('four independent accounts join concurrently and share one race; access and capacity are enforced',async()=>{
+ const accounts=[];
+ for(let i=0;i<5;i++){
+  const signed=await request(auth,{op:'register',username:'team_test_'+i,email:'team'+i+'@example.test',password:'Team-test-password-935'});
+  assert.equal(signed.status,200);accounts.push({sessionToken:signed.data.sessionToken,name:'Equipo '+i});
+ }
+ const created=await request(room,{op:'create',...accounts[0]});assert.equal(created.status,200);
+ const code=created.data.code;accounts[0]={...accounts[0],code,roomToken:created.data.token};
+ const joined=await Promise.all(accounts.slice(1,4).map(a=>request(room,{op:'join',code,...a})));
+ for(let i=0;i<3;i++){assert.equal(joined[i].status,200,JSON.stringify(joined[i].data));accounts[i+1]={...accounts[i+1],code,roomToken:joined[i].data.token};}
+ let states=await Promise.all(accounts.slice(0,4).map(a=>request(room,{op:'state',...a})));
+ const ids=states[0].data.players.map(p=>p.id).sort();assert.equal(ids.length,4);assert.equal(new Set(ids).size,4);
+ for(const s of states){assert.equal(s.status,200);assert.deepEqual(s.data.players.map(p=>p.id).sort(),ids);}
+ const full=await request(room,{op:'join',code,...accounts[4]});assert.equal(full.status,409);assert.match(full.data.error,/cuatro/);
+ const unauthorized=await request(room,{op:'join',code});assert.equal(unauthorized.status,401);
+ const impostor=await request(room,{op:'state',code,sessionToken:accounts[1].sessionToken,roomToken:accounts[0].roomToken});assert.equal(impostor.status,401);
+ const forbidden=await request(room,{op:'start',...accounts[1]});assert.equal(forbidden.status,403);
+ const started=await request(room,{op:'start',...accounts[0]});assert.equal(started.status,200);
+ clock=started.data.startAt+100;
+ const moved=await Promise.all(accounts.slice(0,4).map((a,i)=>request(room,{op:'action',...a,round:started.data.round,action:i%2?'right':'left'})));
+ for(const r of moved)assert.equal(r.status,200,JSON.stringify(r.data));
+ clock+=200;states=await Promise.all(accounts.slice(0,4).map(a=>request(room,{op:'state',...a})));
+ for(const s of states){assert.equal(s.status,200);assert.equal(s.data.startAt,started.data.startAt);assert.equal(s.data.round,started.data.round);assert.deepEqual(s.data.players.map(p=>p.lane),[0,2,0,2]);assert.equal(s.data.players.length,4);}
+ const left=await request(room,{op:'leave',...accounts[0]});assert.equal(left.status,200);
+ const next=await request(room,{op:'state',...accounts[1]});assert.equal(next.data.host,joined[0].data.myId);assert.equal(next.data.players.length,3);
+ const late=await request(room,{op:'join',code,...accounts[4]});assert.equal(late.status,409);assert.match(late.data.error,/ya comenzó/);
+});
